@@ -1,6 +1,7 @@
 const Discord = require("discord.js");
 const Enmap = require("enmap");
 myEnmap = new Enmap({name: "points"});
+const sm = require('string-similarity');
 
 let ft = require('../index.js');
 
@@ -96,9 +97,18 @@ module.exports.run = async (bot, message,args) => {
 // Get Countdown
     if(input){
         try {
-            let key = input;
-            let time = bot.when.get(key, "time");
-            message.channel.send(ft.timeUntil(time, key));
+            let array = bot.when;
+            let arrayCollection = [];
+            function logMapElements(value, key, map) {
+                arrayCollection.push(key)
+            }
+            array.forEach(logMapElements);
+
+            let match = sm.findBestMatch(input, arrayCollection);
+            let countdown = match.bestMatch.target;
+
+            let time = bot.when.get(countdown, "time");
+            message.channel.send(ft.timeUntil(time, countdown));
         } catch(err) {
             message.channel.send(ft.gaiaEmbed("Couldn't find this countdown.", "#7289da"));
         }
